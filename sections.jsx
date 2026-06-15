@@ -686,7 +686,7 @@ function Footer() {
           </div>
         </div>
         <div className="colofon">
-          <span>© 2024 Alexander Neri · GPL-3.0-or-later</span>
+          <span>© 2024–2026 Alexander Neri · GPL-3.0-or-later</span>
           <span className="mono">readability-ts v0.9.0 · made for folders of prose</span>
         </div>
       </div>
