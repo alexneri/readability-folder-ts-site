@@ -10,7 +10,7 @@ function Nav({ dark, onToggleTheme, sections, active }) {
         <a href="#top" className="brand" aria-label="readability-ts home">
           <span className="brand-mark">r</span>
           <span>readability-ts</span>
-          <span style={{ color: "var(--muted)", fontWeight: 400 }}>v0.8.0</span>
+          <span style={{ color: "var(--muted)", fontWeight: 400 }}>v0.9.0</span>
         </a>
         <nav className="nav-links" aria-label="In-page sections">
           {sections.map(s => (
@@ -40,7 +40,7 @@ function Hero() {
         <div className="hero-grid">
           <div>
             <span className="kicker">
-              <span className="num">01</span> A CLI by Alexander Neri · v0.8.0
+              <span className="num">01</span> A CLI by Alexander Neri · v0.9.0
             </span>
             <h1 style={{ marginTop: 18 }}>
               Score the <span className="hl">readability</span> of every<br/>
@@ -64,7 +64,7 @@ function Hero() {
             </div>
 
             <div className="badge-row">
-              <span className="badge"><span>npm</span><span>v0.8.0</span></span>
+              <span className="badge"><span>npm</span><span>v0.9.0</span></span>
               <span className="badge"><span>license</span><span>GPL-3.0</span></span>
               <span className="badge"><span>node</span><span>≥ 18</span></span>
               <span className="badge"><span>type</span><span>CLI</span></span>
@@ -94,7 +94,7 @@ function Hero() {
               <div className="feature-grid">
                 {[
                   { ord: "i.", t: "Recursive", b: "Walks nested folders. Whatever depth your docs live at, it finds them." },
-                  { ord: "ii.", t: "Multi-format", b: ".md and .adoc out of the box. Markup is stripped so the score reflects prose, not syntax." },
+                  { ord: "ii.", t: "Multi-format", b: "AsciiDoc and Markdown — .adoc, .asciidoc, .md, .markdown, and .mdx — out of the box. Markup is stripped so the score reflects prose, not syntax." },
                   { ord: "iii.", t: "Beyond a single number", b: "Sentence, word, average-word-length, syllables, code-block presence, and acronym count." },
                 ].map((f, i) => (
                   <div className="feature" key={i}>
@@ -120,6 +120,11 @@ function Hero() {
 
 /* ─── Updates feed ──────────────────────────────────────────────── */
 const UPDATES = [
+  {
+    date: "2026-06-15", tag: "v0.9.0", major: true,
+    title: "Idempotent runs, new CLI flags, faster scans",
+    body: "Re-running is now safe: existing readability headers are found via readability-score:start / readability-score:end sentinels and replaced in place instead of stacking duplicates, and legacy pre-0.9 headers are migrated automatically on the next run. Adds --dry-run (-n) to compute scores without modifying files or writing scores.txt, plus --version (-v) and --whats-new (--release-notes, -rn). Vendored and build directories — node_modules, .git, dist, build, out, .next, .nuxt, .cache, coverage, .idea, .vscode — are now skipped by default, and files are processed concurrently (8 at a time) behind a TTY progress bar.",
+  },
   {
     date: "2024-11-25", tag: "v0.8.0", major: true,
     title: "Markdown support + richer metrics",
@@ -166,6 +171,10 @@ function UpdatesSection() {
                 <p className="t-body">{u.body}</p>
               </article>
             ))}
+            <a href="https://github.com/alexneri/readability-folder-ts/commits/main" target="_blank" rel="noreferrer"
+               className="mono" style={{ fontSize: 12.5, color: "var(--muted)", display: "inline-block", marginTop: 8 }}>
+              Full changelog on GitHub →
+            </a>
           </div>
 
           <aside>
@@ -220,7 +229,7 @@ function HowItWorks() {
 
         <div className="steps">
           {[
-            { t: "Scan",      b: "Walks the folder you point it at, recursively. Collects every .adoc and .md file." },
+            { t: "Scan",      b: "Walks the folder you point it at, recursively. Collects every .adoc, .asciidoc, .md, .markdown, and .mdx file — and skips vendored and build directories (node_modules, .git, dist, build, …) by default." },
             { t: "Clean",     b: "Strips headings (==), rule lines (----), fenced code, and attribute lists [...] so the score reflects prose, not syntax." },
             { t: "Score",     b: "Applies Flesch–Kincaid, clamps to 0–100, and tallies sentences, words, syllables, code blocks, and acronyms." },
             { t: "Annotate",  b: "Prepends a comment block to each file with the score and stats. Writes a combined scores.txt at the root." },
@@ -330,9 +339,37 @@ function HowToUse() {
         </div>
 
         <h3 style={{ fontFamily: "var(--serif)", fontWeight: 500, fontSize: 24, marginBottom: 12 }}>Run it</h3>
+        <p className="mono" style={{ fontSize: 12.5, color: "var(--muted)", letterSpacing: ".02em", marginBottom: 12 }}>
+          readability-ts [path] [options]
+        </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 32 }}>
-          <CopyBlock text="readability-ts /path/to/folder" />
-          <CopyBlock text="readability-ts                  # scan the current folder" />
+          <CopyBlock text="readability-ts ./docs     # scan a folder" />
+          <CopyBlock text="readability-ts            # scan the current folder" />
+          <CopyBlock text="readability-ts ./docs -n  # dry run, write nothing" />
+        </div>
+
+        <h3 style={{ fontFamily: "var(--serif)", fontWeight: 500, fontSize: 24, marginBottom: 8 }}>Options</h3>
+        <p style={{ color: "var(--muted)", marginBottom: 16, maxWidth: "62ch" }}>
+          Every flag the CLI understands. Run <code className="mono">readability-ts --help</code> to print this in your terminal.
+        </p>
+        <div style={{ padding: 24, border: "1px solid var(--rule)", borderRadius: 14, background: "color-mix(in oklab, var(--paper-2) 60%, transparent)", marginBottom: 32 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {[
+              ["-n,  --dry-run", "Compute scores without writing files"],
+              ["-v,  --version", "Print the installed version"],
+              ["-rn, --whats-new, --release-notes", "Print release notes"],
+              ["-h,  --help", "Show usage"],
+            ].map(([flag, desc], i, arr) => (
+              <div key={i} style={{ display: "grid", gridTemplateColumns: "minmax(150px, 320px) 1fr", gap: 16, alignItems: "baseline", padding: "10px 0", borderBottom: i === arr.length - 1 ? "0" : "1px dashed var(--rule)" }}>
+                <span className="mono" style={{ fontSize: 13, color: "var(--ink)", fontWeight: 600 }}>{flag}</span>
+                <span style={{ fontSize: 13.5, color: "var(--muted)" }}>{desc}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px dashed var(--rule)" }}>
+            <div className="mono" style={{ fontSize: 11, color: "var(--muted)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>Supported extensions</div>
+            <div className="mono" style={{ fontSize: 13, color: "var(--ink-2)" }}>.adoc · .asciidoc · .md · .markdown · .mdx</div>
+          </div>
         </div>
 
         <div className="two-col">
@@ -547,9 +584,9 @@ function VsSection() {
 /* ─── FAQ ───────────────────────────────────────────────────────── */
 const FAQS = [
   { q: "Why Flesch–Kincaid?",
-    a: "It's old, well-studied, and good enough for the job. The 1948 formula is simple, deterministic, and language-aware in a useful way: more syllables and longer sentences make text harder. v0.8 ships with FK alone; the roadmap adds SMOG, Dale-Chall, and Gunning-Fog as opt-ins." },
+    a: "It's old, well-studied, and good enough for the job. The 1948 formula is simple, deterministic, and language-aware in a useful way: more syllables and longer sentences make text harder. v0.9 ships with FK alone; the roadmap adds SMOG, Dale-Chall, and Gunning-Fog as opt-ins." },
   { q: "Does it modify my files?",
-    a: "Yes — it prepends a comment block with the score and stats to the top of each scanned file. That's the whole point: the score travels with the doc. If you don't want that, run it against a copy of the folder or revert after." },
+    a: "By default, yes — it prepends a comment block with the score and stats to the top of each scanned file. That's the whole point: the score travels with the doc. As of v0.9 those headers are idempotent: a re-run finds the existing block via readability-score:start / readability-score:end sentinels and replaces it in place instead of stacking duplicates, and legacy pre-0.9 headers are migrated automatically. If you want no writes at all, use --dry-run (-n) to compute scores without touching your files." },
   { q: "Will it ever support .rst, .txt, or .html?",
     a: "It's on the roadmap. The hard part isn't reading the files; it's stripping the right things so the score reflects prose, not syntax. Open an issue if you have a specific format in mind." },
   { q: "Is the score localised?",
@@ -557,7 +594,7 @@ const FAQS = [
   { q: "How do I uninstall?",
     a: "npm uninstall -g @alexneri/readability-ts — or unlink it if you installed from source. The annotations stay in your files unless you remove them yourself." },
   { q: "Can I just get the numbers without the file annotations?",
-    a: "Not in v0.8. The scores.txt summary is always written; the per-file comment is always prepended. A --report-only flag is a good candidate for the next minor — file an issue." },
+    a: "Yes — as of v0.9, run with --dry-run (-n) to compute and print scores without modifying any files or writing scores.txt. Drop the flag when you want the per-file annotations and the scores.txt summary written back." },
 ];
 
 function FAQSection() {
@@ -650,7 +687,7 @@ function Footer() {
         </div>
         <div className="colofon">
           <span>© 2024 Alexander Neri · GPL-3.0-or-later</span>
-          <span className="mono">readability-ts v0.8.0 · made for folders of prose</span>
+          <span className="mono">readability-ts v0.9.0 · made for folders of prose</span>
         </div>
       </div>
     </footer>
